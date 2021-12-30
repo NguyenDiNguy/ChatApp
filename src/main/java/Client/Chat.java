@@ -100,15 +100,15 @@ public class Chat extends  JFrame {
         l4.setBounds(110, 35, 100, 20);
         p1.add(l4);
 
-//        Timer t = new Timer(1, new ActionListener() {
-//            public void actionPerformed(ActionEvent ae) {
-//                if (!typing) {
-//                    l4.setText("Active Now");
-//                }
-//            }
-//        });
-//
-//        t.setInitialDelay(0);
+        Timer t = new Timer(1, new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                if (!typing) {
+                    l4.setText("Active Now");
+                }
+            }
+        });
+
+        t.setInitialDelay(0);
 
 
         a1 = new JPanel();
