@@ -1,4 +1,4 @@
-package Client;
+package Client.Chat;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

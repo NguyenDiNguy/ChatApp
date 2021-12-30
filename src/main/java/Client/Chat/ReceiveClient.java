@@ -1,9 +1,9 @@
-package Client;
+package Client.Chat;
 
-import javax.swing.*;
 import java.awt.*;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -18,19 +18,17 @@ public class ReceiveClient extends javax.swing.JFrame  implements Runnable{
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
+		Chat.scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+			public void adjustmentValueChanged(AdjustmentEvent e) {
+				e.getAdjustable().setValue(e.getAdjustable().getMaximum());
+			}
+		});
 		String sms;
 		try{
 			while(true){
 				Chat.a1.setLayout(new BorderLayout());
 				sms = dis.readUTF();
-				JPanel p2 = Chat.formatLabel(sms);
-				JPanel left = new JPanel(new BorderLayout());
-				left.add(p2, BorderLayout.LINE_START);
-
-				Chat.vertical.add(left);
-				Chat.vertical.add(Box.createVerticalStrut(15));
-				Chat.a1.add(Chat.vertical, BorderLayout.PAGE_START);
-				Chat.f1.validate();
+				Chat.executorService.execute(new ReceiveUI(sms));
 			}
 
 		}catch(Exception e){}

@@ -1,9 +1,11 @@
-package Client;
+package Client.Login;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
+
+import Client.Matching.WaitingUI;
 
 import javax.swing.*;
 import java.awt.*;

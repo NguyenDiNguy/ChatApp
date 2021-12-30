@@ -2,19 +2,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package Client;
+package Client.Matching;
 
-import javax.swing.*;
+import Client.Matching.Matching;
+
 import java.awt.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URL;
-import java.util.Objects;
-import java.util.StringTokenizer;
 
 public class WaitingUI extends javax.swing.JFrame {
     private DataOutputStream dos = null;

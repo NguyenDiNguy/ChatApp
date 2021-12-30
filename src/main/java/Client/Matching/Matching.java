@@ -1,4 +1,6 @@
-package Client;
+package Client.Matching;
+
+import Client.Chat.Chat;
 
 import javax.swing.*;
 import java.io.DataInputStream;
