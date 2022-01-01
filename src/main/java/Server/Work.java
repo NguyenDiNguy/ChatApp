@@ -39,12 +39,13 @@ public class Work implements Runnable {
 						checkName();
 						break;
 					case  "\\Match":
-						match();
 						System.out.println("Match");
+						match();
 						break;
 					case  "\\Stop":
+						System.out.println("Stop");
 						Server.waitingList.remove(name);
-						matchFlag = false;
+//						matchFlag = false;
 						break;
 					case  "\\Exit":
 						System.out.println("exit");
@@ -52,6 +53,7 @@ public class Work implements Runnable {
 						exit = true;
 						break;
 					default:
+						System.out.println(command);
 				}
 			}
 
@@ -63,17 +65,23 @@ public class Work implements Runnable {
 		DataInputStream dis = new DataInputStream(socket.getInputStream());
 		DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
 		dos.writeUTF("A;"+name);
-		Thread.sleep(2000);
+		Thread.sleep(1000);
 		if (dis.readBoolean()) {
 			return dis.readUTF();
 		}else {
+			System.out.println("Từ chối");
 			return null;
 		}
 	}
 	synchronized void match() throws Exception {
 		Boolean flag = false;
-		matchFlag =true;
+		System.out.println("Begin match");
+//		matchFlag =true;
 		for (Map.Entry<String, Socket> entry : Server.waitingList.entrySet()) {
+//			if(!matchFlag){
+//				System.out.println("Out");
+//				break;
+//			}
 			System.out.println(entry.getKey() + " - " + entry.getValue());
 			dos.writeUTF("B;" + entry.getKey());
 			boolean result = dis.readBoolean();
@@ -96,9 +104,8 @@ public class Work implements Runnable {
 			System.out.println("Chuyển vào hàng đợi");
 			Server.waitingList.put(name, socket);
 			if(dis.readBoolean()){
-				Thread.sleep(2000);
+				Thread.sleep(1000);
 			};
-
 			System.out.println("Continute");
 		}else {
 			System.out.println("Kết nối thành công");

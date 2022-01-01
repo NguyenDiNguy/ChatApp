@@ -49,7 +49,9 @@ public class WaitingUI extends javax.swing.JFrame {
             public void windowClosing(WindowEvent windowEvent) {
                 executorService.shutdownNow();
                 try {
-                    dos.writeBoolean(true);
+                    if(btnStart.getText().equalsIgnoreCase("Stop")){
+                        dos.writeBoolean(true);
+                    }
                     dos.writeUTF("\\Exit");
                     dos.close();
                     dis.close();
@@ -118,6 +120,8 @@ public class WaitingUI extends javax.swing.JFrame {
         }else{
             executorService.shutdownNow();
             jLabel2.setVisible(false);
+            dos.writeBoolean(true);
+            dos.writeUTF("\\Stop");
             btnStart.setText("Start");
             executorService =  Executors.newCachedThreadPool();
         }

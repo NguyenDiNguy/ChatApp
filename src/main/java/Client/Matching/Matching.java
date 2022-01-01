@@ -21,12 +21,14 @@ public class Matching implements Runnable{
     public Boolean flag;
     public Matching(Socket socket, String name, WaitingUI waitingUI) throws IOException {
         this.socket = socket;
+        System.out.println(socket);
         this.name = name;
         this.waitingUI = waitingUI;
         this.dos = new DataOutputStream(this.socket.getOutputStream());
         this.dis = new DataInputStream(this.socket.getInputStream());
         flag = true;
         this.dos.writeUTF("\\Match");
+        System.out.println("Match Begin");
     }
     public Socket createConnect() throws IOException {
         svSocket = new ServerSocket(0);
@@ -49,11 +51,13 @@ public class Matching implements Runnable{
     public void run() {
         try {
             while (flag) {
+                System.out.println("Đợi server");
                 String read = dis.readUTF();
                 StringTokenizer st = new StringTokenizer(read, ";");
                 Boolean waiter = (st.nextToken().equalsIgnoreCase("A")) ? true : false;
+                System.out.println(waiter?"Người đợi":"Người mời");
                 String name = st.nextToken();
-                System.out.println(name);
+                System.out.println(name+waiter);
                 int dialogButton = JOptionPane.YES_NO_OPTION;
                 int dialogResult = JOptionPane.showConfirmDialog(null, "Would You Like to chat with " + name + " ?", "Find match", dialogButton);
                 if (dialogResult == JOptionPane.YES_OPTION) {
@@ -79,6 +83,9 @@ public class Matching implements Runnable{
                         }
                     }
                 }else{
+                    if(waiter){
+                        dos.writeBoolean(false);
+                    }
                     dos.writeBoolean(false);
                 }
             }
