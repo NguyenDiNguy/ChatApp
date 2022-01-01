@@ -10,15 +10,17 @@ import java.net.Socket;
 public class ReceiveClient extends javax.swing.JFrame  implements Runnable{
 	private Socket socket;
 	private DataInputStream dis;
-	public ReceiveClient(Socket socket) throws IOException {
+	private Chat chat;
+	public ReceiveClient(Socket socket, Chat chat) throws IOException {
 		this.socket = socket;
+		this.chat = chat;
 		this.dis = new DataInputStream(this.socket.getInputStream());
 	}
 
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		Chat.scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+		chat.scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
 			public void adjustmentValueChanged(AdjustmentEvent e) {
 				e.getAdjustable().setValue(e.getAdjustable().getMaximum());
 			}
@@ -26,15 +28,21 @@ public class ReceiveClient extends javax.swing.JFrame  implements Runnable{
 		String sms;
 		try{
 			while(true){
-				Chat.a1.setLayout(new BorderLayout());
 				sms = dis.readUTF();
-				Chat.executorService.execute(new ReceiveUI(sms));
+				System.out.println(sms);
+				if(sms.equalsIgnoreCase("\\Quit")){
+					try {
+						chat.handleClose();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}else {
+					chat.a1.setLayout(new BorderLayout());
+					chat.executorService.execute(new ReceiveUI(sms, chat));
+				}
 			}
 
 		}catch(Exception e){}
-
-		
-		
 	}
 	
 }

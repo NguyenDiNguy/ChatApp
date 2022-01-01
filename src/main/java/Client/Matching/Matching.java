@@ -3,6 +3,7 @@ package Client.Matching;
 import Client.Chat.Chat;
 
 import javax.swing.*;
+import javax.swing.text.StyledEditorKit;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -15,14 +16,20 @@ public class Matching implements Runnable{
     private DataOutputStream dos = null;
     private DataInputStream dis = null;
     private String name;
-    public Matching(Socket socket, String name) throws IOException {
+    private WaitingUI waitingUI;
+    private ServerSocket svSocket;
+    public Boolean flag;
+    public Matching(Socket socket, String name, WaitingUI waitingUI) throws IOException {
         this.socket = socket;
         this.name = name;
+        this.waitingUI = waitingUI;
         this.dos = new DataOutputStream(this.socket.getOutputStream());
         this.dis = new DataInputStream(this.socket.getInputStream());
+        flag = true;
+        this.dos.writeUTF("\\Match");
     }
     public Socket createConnect() throws IOException {
-        ServerSocket svSocket = new ServerSocket(0);
+        svSocket = new ServerSocket(0);
         dos.writeUTF(svSocket.getLocalSocketAddress().toString());
         System.out.println("Đang chờ client kết nối");
         return svSocket.accept();
@@ -37,10 +44,11 @@ public class Matching implements Runnable{
         System.out.println(hot + port);
         return socket = new Socket(hot, port);
     }
+
     @Override
     public void run() {
         try {
-            while (true) {
+            while (flag) {
                 String read = dis.readUTF();
                 StringTokenizer st = new StringTokenizer(read, ";");
                 Boolean waiter = (st.nextToken().equalsIgnoreCase("A")) ? true : false;
@@ -51,21 +59,30 @@ public class Matching implements Runnable{
                 if (dialogResult == JOptionPane.YES_OPTION) {
                     dos.writeBoolean(true);
                     if (waiter) {
-                        Chat chat = new Chat(createConnect(), name, this.name);
+                        dos.writeBoolean(true);
+                        Chat chat = new Chat(createConnect(), name, waitingUI);
+                        dos.writeUTF("\\Break");
                         chat.setVisible(true);
+                        waitingUI.setVisible(false);
+                        flag=false;
+                        this.svSocket.close();
                     } else {
                         String address = dis.readUTF();
+                        System.out.println(address);
                         if (!address.equalsIgnoreCase("reject")) {
-                            Chat chat = new Chat(connect(address), name, this.name);
+                            Chat chat = new Chat(connect(address), name, waitingUI);
                             chat.setVisible(true);
+                            waitingUI.setVisible(false);
+                            flag = false;
                         } else {
-                            //thong bao tu choi ghep doi
+                            JOptionPane.showMessageDialog(null, "Bạn đã bị từ chối");
                         }
                     }
+                }else{
+                    dos.writeBoolean(false);
                 }
             }
         }catch (Exception e){
-            e.printStackTrace();
         }
     }
 }

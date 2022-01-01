@@ -1,10 +1,14 @@
 package Client.Chat;
 
+import Client.Matching.WaitingUI;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
@@ -13,33 +17,33 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Chat extends  JFrame {
-    private Socket socket;
+    private  Socket socket;
     private String myname;
     private String name;
-    public JPanel p1;
-    public static JScrollPane scrollPane;
-    public static JTextField t1;
-    public static JButton b1;
-    public static JPanel a1;
-    public static JFrame f1 = new JFrame();
-    public static Box vertical = Box.createVerticalBox();
+    private JPanel p1;
+    public JScrollPane scrollPane;
+    public  JTextField t1;
+    public  JButton b1;
+    public JPanel a1;
+    public  JFrame f1 = new JFrame();
+    public  Box vertical = Box.createVerticalBox();
     private ServerSocket skt;
     private Socket s;
-    public static ExecutorService executorService = Executors.newCachedThreadPool();
+    private  WaitingUI waitingUI;
+    public  ExecutorService executorService = Executors.newCachedThreadPool();
     Boolean typing;
     Chat() { init(); }
-    public Chat(Socket socket, String name, String myname) throws IOException {
+    public Chat(Socket socket, String name, WaitingUI waitingUI) throws IOException {
         this.socket = socket;
         this.name = name;
-        this.myname = myname;
+        this.waitingUI = waitingUI;
         init();
         System.out.println(this.socket + this.name + this.myname);
-        executorService.execute(new ReceiveClient(socket));
+        executorService.execute(new ReceiveClient(socket,this));
     }
 
     public void init(){
-        f1.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
+        f1.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE );
         p1 = new JPanel();
         p1.setLayout(null);
         p1.setBackground(new Color(7, 94, 84));
@@ -106,12 +110,42 @@ public class Chat extends  JFrame {
                 }
             }
         });
-    }
 
+        f1.addWindowListener(new java.awt.event.WindowAdapter() {
+
+
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                try {
+                    callClose();
+                    socket.close();
+                    executorService.shutdownNow();
+                    waitingUI.open();
+                    dispose();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+    }
+    public void callClose() throws InterruptedException {
+        Thread close = new Thread(new SentClient(socket,"\\Quit"));
+        close.start();
+        close.join();
+    }
+    public void handleClose() throws IOException {
+        socket.close();
+        executorService.shutdownNow();
+        waitingUI.open();
+        JOptionPane.showMessageDialog(null, name+" has exited this chat session !");
+        f1.dispose();
+    }
     private void handleSent () {//GEN-FIRST:event_tfInputMessKeyPressed
         String out = t1.getText().trim();
         if(!out.equalsIgnoreCase("")) {
-            executorService.execute(new SentUI(out));
+            executorService.execute(new SentUI(out, this));
             executorService.execute(new SentClient(socket, out));
         }
     }

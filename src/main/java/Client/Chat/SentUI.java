@@ -7,18 +7,20 @@ import java.awt.*;
 
 public class SentUI implements Runnable{
     private String out;
-    public SentUI(String out){
+    private Chat chat;
+    public SentUI(String out, Chat chat){
         this.out = out;
+        this.chat = chat;
     }
     @Override
     public void run() {
-        Chat.a1.setLayout(new BorderLayout());
-        JPanel p2 = Chat.formatLabel(out);
+        chat.a1.setLayout(new BorderLayout());
+        JPanel p2 = chat.formatLabel(out);
         JPanel right = new JPanel(new BorderLayout());
         right.add(p2, BorderLayout.LINE_END);
-        Chat.vertical.add(right);
-        Chat.vertical.add(Box.createVerticalStrut(15));
-        Chat.a1.add(Chat.vertical, BorderLayout.PAGE_START);
-        Chat.t1.setText("");
+        chat.vertical.add(right);
+        chat.vertical.add(Box.createVerticalStrut(15));
+        chat.a1.add(chat.vertical, BorderLayout.PAGE_START);
+        chat.t1.setText("");
     }
 }

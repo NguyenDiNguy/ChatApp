@@ -34,23 +34,8 @@ public class Login extends javax.swing.JFrame {
         this.dis = new DataInputStream(this.socket.getInputStream());
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
+        this.dos.writeUTF("\\Login");
 
-    }
-    public void sentName() throws IOException {
-        sc = new Scanner(System.in);
-        String name;
-
-
-        while (true) {
-            System.out.println("Vui lòng nhập vào biệt danh");
-            name = sc.nextLine();
-            dos.writeUTF(name);
-            String result = dis.readUTF();
-            System.out.println(result);
-            if (!result.equalsIgnoreCase("\false")) {
-                break;
-            }
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -156,7 +141,7 @@ public class Login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
     private void login() throws IOException {
         String name = tfNickname.getText();
-
+        name =name.substring(0, 1).toUpperCase() + name.substring(1);
         dos = new DataOutputStream(this.socket.getOutputStream());
         dis = new DataInputStream(this.socket.getInputStream());
 
@@ -183,7 +168,7 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) throws IOException {//GEN-FIRST:event_formWindowClosing
-        dos.writeUTF("\\close");
+        dos.writeUTF("\\Exit");
         dos.close();
         dis.close();
         this.socket.close();

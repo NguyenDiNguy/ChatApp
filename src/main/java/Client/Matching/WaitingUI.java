@@ -6,23 +6,30 @@ package Client.Matching;
 
 import Client.Matching.Matching;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class WaitingUI extends javax.swing.JFrame {
     private DataOutputStream dos = null;
     private DataInputStream dis = null;
     private  Socket socket;
     private String name;
-    private Boolean flag;
+    public Boolean flag;
+    public Thread matching;
+    public ExecutorService executorService;
     public WaitingUI(String name , Socket socket) throws Exception{
         this.socket = socket;
         this.name = name;
         this.dos = new DataOutputStream(this.socket.getOutputStream());
         this.dis = new DataInputStream(this.socket.getInputStream());
+        executorService =  Executors.newCachedThreadPool();
         initComponents();
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
@@ -37,8 +44,22 @@ public class WaitingUI extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel2.setText("Loading...");
         jLabel2.setVisible(false);
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                executorService.shutdownNow();
+                try {
+                    dos.writeBoolean(true);
+                    dos.writeUTF("\\Exit");
+                    dos.close();
+                    dis.close();
+                    socket.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                System.exit(0);
+            }
+        });
         btnStart.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
         btnStart.setText("Start");
         btnStart.addActionListener(new java.awt.event.ActionListener() {
@@ -83,14 +104,28 @@ public class WaitingUI extends javax.swing.JFrame {
         pack();
 
     }// </editor-fold>//GEN-END:initComponents
+    public void open(){
+        btnStart.setText("Start");
+        btnStart.setEnabled(true);
+        jLabel2.setVisible(false);
+        this.setVisible(true);
+    }
 
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) throws IOException {//GEN-FIRST:event_btnStartActionPerformed
-        loading();
-        Thread mathcing = new Thread(new Matching(socket,this.name));
-        mathcing.start();
+        if(btnStart.getText().equalsIgnoreCase("Start")){
+            loading();
+            executorService.execute(new Matching(socket,this.name,this));
+        }else{
+            executorService.shutdownNow();
+            jLabel2.setVisible(false);
+            btnStart.setText("Start");
+            executorService =  Executors.newCachedThreadPool();
+        }
+
     }//GEN-LAST:event_btnStartActionPerformed
     public void loading(){
         jLabel2.setVisible(true);
+        btnStart.setText("Stop");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
