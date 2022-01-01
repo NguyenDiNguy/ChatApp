@@ -14,6 +14,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Random;
 import java.util.Scanner;
 
 /**
@@ -25,6 +26,7 @@ public class Login extends javax.swing.JFrame {
     private Scanner sc;
     private DataOutputStream dos = null;
     private DataInputStream dis = null;
+    private Random random = new Random();
 
     public Login(Socket socket) throws IOException {
         initComponents();
@@ -61,6 +63,7 @@ public class Login extends javax.swing.JFrame {
             }
         });
 
+
         lbTitle.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
         lbTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lbTitle.setText("Login");
@@ -92,7 +95,15 @@ public class Login extends javax.swing.JFrame {
 
         btnRandomLogin.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
         btnRandomLogin.setText("Sign in with random nickname");
-
+        btnRandomLogin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                try {
+                    btnRandomLoginActionPerformed(evt);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         javax.swing.GroupLayout pnLoginLayout = new javax.swing.GroupLayout(pnLogin);
         pnLogin.setLayout(pnLoginLayout);
         pnLoginLayout.setHorizontalGroup(
@@ -166,7 +177,9 @@ public class Login extends javax.swing.JFrame {
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) throws IOException {//GEN-FIRST:event_btnLoginActionPerformed
         login();
     }//GEN-LAST:event_btnLoginActionPerformed
-
+    private void btnRandomLoginActionPerformed(java.awt.event.ActionEvent evt) throws IOException {//GEN-FIRST:event_btnLoginActionPerformed
+        tfNickname.setText("User"+random.nextInt(9999));
+    }
     private void formWindowClosing(java.awt.event.WindowEvent evt) throws IOException {//GEN-FIRST:event_formWindowClosing
         dos.writeUTF("\\Exit");
         dos.close();
