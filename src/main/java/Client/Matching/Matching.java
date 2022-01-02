@@ -53,24 +53,33 @@ public class Matching implements Runnable{
             while (flag) {
                 System.out.println("Đợi server");
                 String read = dis.readUTF();
+                if (read.equalsIgnoreCase("\\Stop")){
+                    System.out.println("Stop");
+                    return;
+                }
                 StringTokenizer st = new StringTokenizer(read, ";");
                 Boolean waiter = (st.nextToken().equalsIgnoreCase("A")) ? true : false;
-                System.out.println(waiter?"Người đợi":"Người mời");
                 String name = st.nextToken();
-                System.out.println(name+waiter);
                 int dialogButton = JOptionPane.YES_NO_OPTION;
-                int dialogResult = JOptionPane.showConfirmDialog(null, "Would You Like to chat with " + name + " ?", "Find match", dialogButton);
-                if (dialogResult == JOptionPane.YES_OPTION) {
-                    dos.writeBoolean(true);
-                    if (waiter) {
+                if (waiter) {
+                    System.out.println(name);
+                    int dialogResult = JOptionPane.showConfirmDialog(null, "Would You Like to chat with " + name + " ?", "Find match", dialogButton);
+                    if (dialogResult == JOptionPane.YES_OPTION) {
+                        dos.writeBoolean(true);
                         dos.writeBoolean(true);
                         Chat chat = new Chat(createConnect(), name, waitingUI);
-                        dos.writeUTF("\\Break");
                         chat.setVisible(true);
                         waitingUI.setVisible(false);
-                        flag=false;
-                        this.svSocket.close();
+                        flag = false;
                     } else {
+                        dos.writeBoolean(false);
+                        dos.writeBoolean(false);
+                    }
+                } else {
+                    int dialogResult = JOptionPane.showConfirmDialog(null, "Would You Like to chat with " + name + " ?", "Find match", dialogButton);
+                    if (dialogResult == JOptionPane.YES_OPTION) {
+                        dos.writeBoolean(true);
+                        System.out.println(name);
                         String address = dis.readUTF();
                         System.out.println(address);
                         if (!address.equalsIgnoreCase("reject")) {
@@ -81,15 +90,13 @@ public class Matching implements Runnable{
                         } else {
                             JOptionPane.showMessageDialog(null, "Bạn đã bị từ chối");
                         }
-                    }
-                }else{
-                    if(waiter){
+                    } else {
                         dos.writeBoolean(false);
                     }
-                    dos.writeBoolean(false);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

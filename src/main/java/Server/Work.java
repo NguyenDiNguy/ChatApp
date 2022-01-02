@@ -44,7 +44,7 @@ public class Work implements Runnable {
 						break;
 					case  "\\Stop":
 						System.out.println("Stop");
-						Server.waitingList.remove(name);
+						dos.writeUTF("\\Stop");
 //						matchFlag = false;
 						break;
 					case  "\\Exit":
@@ -61,11 +61,11 @@ public class Work implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	synchronized String getAccept(Socket socket) throws Exception {
+	public String getAccept(Socket socket) throws Exception {
 		DataInputStream dis = new DataInputStream(socket.getInputStream());
 		DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
 		dos.writeUTF("A;"+name);
-		Thread.sleep(1000);
+		Thread.sleep(2000);
 		if (dis.readBoolean()) {
 			return dis.readUTF();
 		}else {
@@ -73,7 +73,7 @@ public class Work implements Runnable {
 			return null;
 		}
 	}
-	synchronized void match() throws Exception {
+	public void match() throws Exception {
 		Boolean flag = false;
 		System.out.println("Begin match");
 //		matchFlag =true;
@@ -103,8 +103,12 @@ public class Work implements Runnable {
 		if (!flag) {
 			System.out.println("Chuyển vào hàng đợi");
 			Server.waitingList.put(name, socket);
-			if(dis.readBoolean()){
-				Thread.sleep(1000);
+			while(true){
+				if(dis.readBoolean()){
+					Server.waitingList.remove(name);
+					Thread.sleep(1000);
+					break;
+				}
 			};
 			System.out.println("Continute");
 		}else {

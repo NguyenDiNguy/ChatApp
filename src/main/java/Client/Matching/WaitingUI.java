@@ -118,11 +118,12 @@ public class WaitingUI extends javax.swing.JFrame {
             loading();
             executorService.execute(new Matching(socket,this.name,this));
         }else{
-            executorService.shutdownNow();
+
             jLabel2.setVisible(false);
             dos.writeBoolean(true);
             dos.writeUTF("\\Stop");
             btnStart.setText("Start");
+            executorService.shutdownNow();
             executorService =  Executors.newCachedThreadPool();
         }
 
